@@ -17,12 +17,15 @@ data <- data %>%
   mutate(Latitude = as.numeric(Latitude),
          Longitude = as.numeric(Longitude))
 
+limits <- read.csv("limits.csv", header = FALSE, sep=",")
+basemap_limits <- st_as_sf(limits, coords=c("V1","V2"), crs=4326)
+
 points <- st_as_sf(data, coords = c("Longitude","Latitude"), crs=4326)
-basemap <- get_tiles(points, provider="OpenStreetMap")
+basemap <- get_tiles(basemap_limits, provider="OpenStreetMap", zoom = 16)
 
 ggplot() +
   geom_spatraster_rgb(data = basemap) +
-  geom_sf(data = points, colour = "red", size = 0.5) +
-  coord_sf(crs = 3857) + 
+  geom_sf(data = points, colour = "red", size = 1) +
+  coord_sf(crs=4326) + 
   labs(title = "Sampling Locations", caption = "\U00a9 OpenStreetMap contributors") + 
   theme_void()
