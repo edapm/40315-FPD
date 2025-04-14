@@ -1,12 +1,12 @@
 library(tidyverse)
+library(pastecs)
 library(sf)
 library(maptiles)
 library(tidyterra)
 
 rm(list = ls())
 
-file <- read.csv("Data.csv", header = TRUE, sep = ",")
-data <- tibble(file)
+data <- tibble(read.csv("Data.csv", header = TRUE, sep = ","))
 
 # Convert DateTime to a date-time object -> year-month-day, hh:mm:ss timezone
 data$DateTime <- as.POSIXct(data$DateTime, format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Amsterdam")
@@ -31,3 +31,104 @@ ggplot() +
   coord_sf() + 
   labs(title = "Sampling Locations", caption = "\U00a9 OpenStreetMap contributors \U00a9 CARTO") + 
   theme_void()
+
+# Calc Averages
+# Ammonium
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Ammonium_Mean = mean(c(Ammonium1, Ammonium2, Ammonium3), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Ammonium_Mean, .after = Ammonium3)
+
+# Phosphate
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Phosphate_Mean = mean(c(Phosphate1, Phosphate2, Phosphate3), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Phosphate_Mean, .after = Phosphate3)
+
+# Dissolved_Ox
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Dissolved_Ox_Mean = mean(c(Dissolved_Ox1, Dissolved_Ox2, Dissolved_Ox3, Dissolved_Ox4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Dissolved_Ox_Mean, .after = Dissolved_Ox4)
+
+# Water_EC
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Water_EC_Mean = mean(c(Water_EC1, Water_EC2, Water_EC3, Water_EC4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Water_EC_Mean, .after = Water_EC4)
+
+# Water_TDS
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Water_TDS_Mean = mean(c(Water_TDS1, Water_TDS2, Water_TDS3, Water_TDS4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Water_TDS_Mean, .after = Water_TDS4)
+
+# Water_PH
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Water_PH_Mean = mean(c(Water_PH1, Water_PH2, Water_PH3, Water_PH4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Water_PH_Mean, .after = Water_PH4)
+
+# Soil_EC
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Soil_EC_Mean = mean(c(Soil_EC1, Soil_EC2, Soil_EC3, Soil_EC4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Soil_EC_Mean, .after = Soil_EC4)
+
+# Soil_TDS
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Soil_TDS_Mean = mean(c(Soil_TDS1, Soil_TDS2, Soil_TDS3, Soil_TDS4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Soil_TDS_Mean, .after = Soil_TDS4)
+
+# Soil_PH
+data <- data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(Soil_PH_Mean = mean(c(Soil_PH1, Soil_PH2, Soil_PH3, Soil_PH4), na.rm=TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::relocate(Soil_PH_Mean, .after = Soil_PH4)
+
+# Data Analysis
+# Ammonium
+ggplot(data, aes(Site, Ammonium_Mean)) +
+  geom_point() +
+  labs(title = "Average Ammonium Concentration in Ditch Water", y="Ammonium Concentration (mg/l)")
+
+# Phosphate
+ggplot(data, aes(Site, Phosphate_Mean)) +
+  geom_point() +
+  labs(title = "Average Phosphate Concentration in Ditch Water", y="Phosphate Concentration (mg/l)")
+
+# Dissolved_Ox
+ggplot(data, aes(Site, Dissolved_Ox_Mean)) +
+  geom_point() + 
+  labs(title = "Average Dissolved Oxygen Concentration in Ditch Water", y="Dissolved Oxygen Concentration (mg/l)")
+
+# Water_EC and Soil_EC
+ggplot(data, aes(x=Site)) +
+  geom_point(aes(y=Water_EC_Mean, shape="Water")) +
+  geom_point(aes(y=Soil_EC_Mean, shape="Soil")) + 
+  scale_y_continuous(name = "Electrical Conductivity (µS)") + 
+  labs(title = "Average Electrical Conductivity in Ditch Water and Nearby Soil", shape = "")
+
+# Water_TDS and Soil_TDS
+ggplot(data, aes(x=Site)) +
+  geom_point(aes(y=Water_TDS_Mean, shape="Water")) +
+  geom_point(aes(y=Soil_TDS_Mean, shape="Soil")) + 
+  scale_y_continuous(name = "Total Dissolved Solids (ppm)") + 
+  labs(title = "Average Total Dissolved Solids in Ditch Water and Nearby Soil", shape = "")
+
+# Water_PH and Soil_PH
+ggplot(data, aes(x=Site)) +
+  geom_point(aes(y=Water_PH_Mean, shape="Water")) +
+  geom_point(aes(y=Soil_PH_Mean, shape="Soil")) + 
+  scale_y_continuous(name = "pH") + 
+  labs(title = "Average pH in Ditch Water and Nearby Soil", shape = "")
