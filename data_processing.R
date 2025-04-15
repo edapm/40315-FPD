@@ -98,24 +98,36 @@ data <- data |>
 
 # Data Analysis
 # Ammonium
+a_recvalue = 2
 ggplot(data, aes(Site, Ammonium_Mean)) +
   geom_point() +
-  labs(title = "Average Ammonium Concentration in Ditch Water", y="Ammonium Concentration (mg/l)")
+  geom_hline(yintercept = a_recvalue) + 
+  geom_text(aes(0,a_recvalue, label="Recommended Value < 2 mg/L", hjust=-0.05, vjust=1.25)) + 
+  labs(title = "Average Ammonium Concentration in Ditch Water", y="Ammonium Concentration (mg/L)")
 
 # Phosphate
+p_recvalue = 0.1
 ggplot(data, aes(Site, Phosphate_Mean)) +
   geom_point() +
-  labs(title = "Average Phosphate Concentration in Ditch Water", y="Phosphate Concentration (mg/l)")
+  geom_hline(yintercept = p_recvalue) + 
+  geom_text(aes(0,p_recvalue, label="Recommended Value < 0.1 mg/L", hjust=-0.05, vjust=1.25)) + 
+  labs(title = "Average Phosphate Concentration in Ditch Water", y="Phosphate Concentration (mg/L)")
 
 # Dissolved_Ox
+do_recvalue = 10
 ggplot(data, aes(Site, Dissolved_Ox_Mean)) +
   geom_point() + 
-  labs(title = "Average Dissolved Oxygen Concentration in Ditch Water", y="Dissolved Oxygen Concentration (mg/l)")
+  geom_hline(yintercept=do_recvalue) + 
+  geom_text(aes(0,do_recvalue, label="Recommended Value > 10 mg/L", hjust=-0.05, vjust=-1)) + 
+  labs(title = "Average Dissolved Oxygen Concentration in Ditch Water", y="Dissolved Oxygen Concentration (mg/L)")
 
 # Water_EC and Soil_EC
+ec_recvalue = 500
 ggplot(data, aes(x=Site)) +
   geom_point(aes(y=Water_EC_Mean, shape="Water")) +
   geom_point(aes(y=Soil_EC_Mean, shape="Soil")) + 
+  geom_hline(yintercept = ec_recvalue) + 
+  geom_text(aes(0,ec_recvalue, label="Recommended Value < 500 µS", hjust=-0.05, vjust=1.25)) + 
   scale_y_continuous(name = "Electrical Conductivity (µS)") + 
   labs(title = "Average Electrical Conductivity in Ditch Water and Nearby Soil", shape = "")
 
