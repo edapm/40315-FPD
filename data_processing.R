@@ -1,5 +1,7 @@
 library(tidyverse)
 library(pastecs)
+library(psych)
+library(car)
 library(sf)
 library(maptiles)
 library(tidyterra)
@@ -144,3 +146,8 @@ ggplot(data, aes(x=Site)) +
   geom_point(aes(y=Soil_PH_Mean, shape="Soil")) + 
   scale_y_continuous(name = "pH") + 
   labs(title = "Average pH in Ditch Water and Nearby Soil", shape = "")
+
+# Statistical Tests
+# Ammonium
+describe(data$Ammonium_Mean)
+shapiro.test(data$Ammonium_Mean)
