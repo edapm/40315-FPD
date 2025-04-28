@@ -8,7 +8,7 @@ library(tidyterra)
 
 rm(list = ls())
 
-data <- tibble(read.csv("Data.csv", header = TRUE, sep = ","))
+data <- tibble(read_csv("Data.csv", col_names = TRUE))
 
 # Convert DateTime to a date-time object -> year-month-day, hh:mm:ss timezone
 data$DateTime <- as.POSIXct(data$DateTime, format = "%Y-%m-%d %H:%M:%S", tz = "Europe/Amsterdam")
@@ -29,9 +29,10 @@ basemap <- get_tiles(basemap_limits, provider="CartoDB.Positron", zoom = 16)
 
 ggplot() +
   geom_spatraster_rgb(data = basemap) +
-  geom_sf(data = data, show.legend = TRUE, size = 1.25, aes(colour = Site)) +
+  geom_sf(data = data, show.legend = TRUE, size = 1.25, aes(colour = SiteName)) +
+  guides(color=guide_legend(title = "Site")) + 
   coord_sf() + 
-  labs(title = "Sampling Locations", caption = "\U00a9 OpenStreetMap contributors \U00a9 CARTO") + 
+  labs(caption = "\U00a9 OpenStreetMap contributors \U00a9 CARTO") + 
   theme_void()
 
 # Calc Averages
@@ -101,51 +102,51 @@ data <- data |>
 # Data Analysis
 # Ammonium
 a_recvalue = 2
-ggplot(data, aes(Site, Ammonium_Mean)) +
+ggplot(data, aes(SiteName, Ammonium_Mean)) +
   geom_point() +
   geom_hline(yintercept = a_recvalue) + 
   geom_text(aes(0,a_recvalue, label="Recommended Value < 2 mg/L", hjust=-0.05, vjust=1.25)) + 
-  labs(title = "Average Ammonium Concentration in Ditch Water", y="Ammonium Concentration (mg/L)")
+  labs(x = "Site", y="Ammonium Concentration (mg/L)")
 
 # Phosphate
 p_recvalue = 0.1
-ggplot(data, aes(Site, Phosphate_Mean)) +
+ggplot(data, aes(SiteName, Phosphate_Mean)) +
   geom_point() +
   geom_hline(yintercept = p_recvalue) + 
   geom_text(aes(0,p_recvalue, label="Recommended Value < 0.1 mg/L", hjust=-0.05, vjust=1.25)) + 
-  labs(title = "Average Phosphate Concentration in Ditch Water", y="Phosphate Concentration (mg/L)")
+  labs(x = "Site", y="Phosphate Concentration (mg/L)")
 
 # Dissolved_Ox
 do_recvalue = 10
-ggplot(data, aes(Site, Dissolved_Ox_Mean)) +
+ggplot(data, aes(SiteName, Dissolved_Ox_Mean)) +
   geom_point() + 
   geom_hline(yintercept=do_recvalue) + 
   geom_text(aes(0,do_recvalue, label="Recommended Value > 10 mg/L", hjust=-0.05, vjust=-1)) + 
-  labs(title = "Average Dissolved Oxygen Concentration in Ditch Water", y="Dissolved Oxygen Concentration (mg/L)")
+  labs(x = "Site", y="Dissolved Oxygen Concentration (mg/L)")
 
 # Water_EC and Soil_EC
 ec_recvalue = 500
-ggplot(data, aes(x=Site)) +
+ggplot(data, aes(x=SiteName)) +
   geom_point(aes(y=Water_EC_Mean, shape="Water")) +
   geom_point(aes(y=Soil_EC_Mean, shape="Soil")) + 
   geom_hline(yintercept = ec_recvalue) + 
   geom_text(aes(0,ec_recvalue, label="Recommended Value < 500 µS", hjust=-0.05, vjust=1.25)) + 
   scale_y_continuous(name = "Electrical Conductivity (µS)") + 
-  labs(title = "Average Electrical Conductivity in Ditch Water and Nearby Soil", shape = "")
+  labs(x = "Site", shape = "")
 
 # Water_TDS and Soil_TDS
-ggplot(data, aes(x=Site)) +
+ggplot(data, aes(x=SiteName)) +
   geom_point(aes(y=Water_TDS_Mean, shape="Water")) +
   geom_point(aes(y=Soil_TDS_Mean, shape="Soil")) + 
   scale_y_continuous(name = "Total Dissolved Solids (ppm)") + 
-  labs(title = "Average Total Dissolved Solids in Ditch Water and Nearby Soil", shape = "")
+  labs(x = "Site", shape = "")
 
 # Water_PH and Soil_PH
-ggplot(data, aes(x=Site)) +
+ggplot(data, aes(x=SiteName)) +
   geom_point(aes(y=Water_PH_Mean, shape="Water")) +
   geom_point(aes(y=Soil_PH_Mean, shape="Soil")) + 
   scale_y_continuous(name = "pH") + 
-  labs(title = "Average pH in Ditch Water and Nearby Soil", shape = "")
+  labs(x = "Site", shape = "")
 
 # Statistical Tests
 # Ammonium
