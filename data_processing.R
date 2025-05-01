@@ -5,6 +5,7 @@ library(car)
 library(sf)
 library(maptiles)
 library(tidyterra)
+# library(plotly)
 
 rm(list = ls())
 
@@ -149,6 +150,23 @@ ggplot(data, aes(x=SiteName)) +
   labs(x = "Site", shape = "")
 
 # Statistical Tests
-# Ammonium
-describe(data$Ammonium_Mean)
-shapiro.test(data$Ammonium_Mean)
+# Ammonium vs Phosphate - Correlation
+# H(null) = There is no correlation between avg. Amm. lvls and avg. Pho. lvls
+# at the 95% significance level
+# H(alt) = There is a correlation between avg. Amm. lvls and avg. Pho. lvls
+hist(data$Ammonium_Mean)
+hist(data$Phosphate_Mean)
+
+ggplot(data, aes(x=Ammonium_Mean, y=Phosphate_Mean)) +
+  geom_point(aes(color=SiteName)) + 
+  geom_smooth(method = lm)
+
+cor.test(data$Ammonium_Mean, data$Phosphate_Mean, method="spearman", exact=FALSE)
+
+ggplot(data, aes(x=Ammonium_Mean, y=Dissolved_Ox_Mean)) + 
+  geom_point(aes(color=SiteName)) + 
+  geom_smooth(method = lm)
+
+cor.test(data$Ammonium_Mean, data$Dissolved_Ox_Mean, method="spearman", exact=FALSE)
+
+# plot_ly(x=data$Ammonium_Mean, y=data$Phosphate_Mean, z=data$Dissolved_Ox_Mean, type="scatter3d", mode="markers", color=data$SiteName)
